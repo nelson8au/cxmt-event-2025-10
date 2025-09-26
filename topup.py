@@ -74,6 +74,7 @@ def manage_event(eventname):
     try:
         if eventname == "all":
             # Reset all events
+            print("eventname", eventname)
             for idx, (key, prizes) in enumerate(prizes_dict.items(), start=1):
                 reset_event(f"2005mid:100{idx}", prizes)
             res = "All events are updated"
