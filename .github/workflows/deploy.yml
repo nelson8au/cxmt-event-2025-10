@@ -21,12 +21,10 @@ jobs:
       - name: Install dependencies and package Lambda
         run: |
           python -m pip install --upgrade pip
-          # install dependencies into the package folder
           pip install -r requirements.txt -t package/
-          # copy only your source files (not package itself) into package folder
           cp *.py package/
-          cp -r topup package/   # copy your module folder if any
           cd package && zip -r ../lambda.zip .
+
 
 
       - name: Configure AWS credentials
