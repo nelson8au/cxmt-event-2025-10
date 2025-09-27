@@ -48,7 +48,7 @@ def topup_event(key: str, prizes: list) -> str:
 def reset_event(key: str, prizes: list) -> str:
     """Reset a single event Redis list."""
     redis.delete(key)
-    return f"Event {key} prizes have been recreated."
+    return f"Event {key} prizes have been deleted."
 
 def check_all_event_lengths() -> dict:
     """Return current lengths of all Redis prize lists."""
