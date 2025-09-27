@@ -285,7 +285,7 @@ def pop_prize(prize_key: str) -> Optional[str]:
         print(f"popped prize from {prize_key} -> {prize}" )
         return prize
     except Exception:
-        print(f"Failed to pop prize key={}" )
+        print(f"Failed to pop prize key={prize_key}" )
         return None
 
 def process_red_envelope(email: str, prize: str, event_name: str, prize_key: str) -> Dict[str, Any]:
