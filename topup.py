@@ -2,19 +2,19 @@ import json
 from redis import Redis
 
 # --- Redis connection ---
-REDIS_HOST = "cxmt-cache-eqwznd.serverless.apne1.cache.amazonaws.com"
-REDIS_PORT = 6379
-REDIS_USERNAME = "default"
-REDIS_SSL = True
+# REDIS_HOST = "cxmt-cache-eqwznd.serverless.apne1.cache.amazonaws.com"
+# REDIS_PORT = 6379
+# REDIS_USERNAME = "default"
+# REDIS_SSL = True
 
-redis = Redis(
-    host=REDIS_HOST,
-    port=REDIS_PORT,
-    username=REDIS_USERNAME,
-    decode_responses=True,
-    ssl=REDIS_SSL,
-)
-
+# redis = Redis(
+#     host=REDIS_HOST,
+#     port=REDIS_PORT,
+#     username=REDIS_USERNAME,
+#     decode_responses=True,
+#     ssl=REDIS_SSL,
+# )
+redis=Redis(host='cxmt-cache-eqwznd.serverless.apne1.cache.amazonaws.com', port=6379, decode_responses=True, ssl=True, username='default')
 # --- Prize initialization ---
 def init_all_prizes():
     """
@@ -40,9 +40,11 @@ def init_all_prizes():
 # --- Redis helpers ---
 def reset_event(key: str, prizes: list) -> str:
     """Reset a single event Redis list."""
-    redis.delete(key)
+    res=redis.delete(key)
+    print(res)
     if prizes:
-        redis.rpush(key, *prizes)
+        res=redis.rpush(key, *prizes)
+        print(res)
     return f"Event {key} prizes have been recreated."
 
 def check_all_event_lengths() -> dict:
