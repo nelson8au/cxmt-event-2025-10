@@ -425,7 +425,8 @@ def lambda_handler(event, context):
         "e20251005": {"prize_key": "2005mid:1005", "event": "2025-10-05", "eligibility": deposit_eligibility_factory("2025-10-01;2025-10-04", Decimal("500"))},
         "e20251006": {"prize_key": "2005mid:1006", "event": "2025-10-06", "eligibility": None},
         "e20251007": {"prize_key": "2005mid:1007", "event": "2025-10-07", "eligibility": trade_eligibility_factory("2025-10-06;2025-10-06")},
-        "e20251008": {"prize_key": "2005mid:1008", "event": "2025-10-08", "eligibility": trade_eligibility_factory("2025-10-07;2025-10-07")},
+        #"e20251008": {"prize_key": "2005mid:1008", "event": "2025-10-08", "eligibility": trade_eligibility_factory("2025-10-07;2025-10-07")},
+        "e20251008": {"prize_key": "2005mid:1008", "event": "2025-10-08", "eligibility": None},
     }
 
     if funcname is None:

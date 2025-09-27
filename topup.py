@@ -45,7 +45,7 @@ def topup_event(key: str, prizes: list) -> str:
     if prizes:
         redis.rpush(key, *prizes)
     return f"Event {key} prizes have been recreated."
-def reset_event(key: str, prizes: list) -> str:
+def reset_event(key: str) -> str:
     """Reset a single event Redis list."""
     redis.delete(key)
     return f"Event {key} prizes have been deleted."
@@ -66,7 +66,7 @@ def manage_event(eventname: str):
             # Reset all events
             for idx, prizes in enumerate(prizes_dict.values(), start=1):
                 redis_key = f"2025mid:100{idx}"
-                res=reset_event(redis_key, prizes)
+                res=reset_event(redis_key)
             return res
         elif eventname =="topupall":
             for idx, prizes in enumerate(prizes_dict.values(), start=1):
