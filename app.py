@@ -210,13 +210,14 @@ def fetch_wallet(user_id: str) -> Optional[str]:
         print("CXM_TOKEN not provided")
         return None
     url = f"{CXM_BASE}/api.lps.user.wallet.getWallets?token={CXM_TOKEN}"
+    print(url)
     payload = {"userId": user_id}
 
     try:
         resp = session.post(url, json=payload, timeout=10)
         data = safe_json(resp)
+        print('data', data)
         if isinstance(data, list) and data:
-            print('data', data)
             wallet_id = data[0].get("id")
             print("fetch_wallet -> %s", wallet_id)
             return wallet_id
