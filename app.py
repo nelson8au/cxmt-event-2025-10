@@ -326,13 +326,14 @@ def process_email_prize(email: str, prize: str, event_name: str) -> Dict[str, An
    
 def process_lp_or_coupon(email: str, prize: str, event_name: str, lp_amount: Decimal = Decimal("18")) -> Dict[str, Any]:
     """Handle awarding loyalty points (lp) or coupons. Default lp_amount 18 (as in original)."""
-    print('lp', lp_amount)
+   
     user_id = query_ledger(email)
     if not user_id:
         return {"statusCode": 400, "body": json.dumps({"Status": "error", "Message": "User not found"})}
     # Update ledger (will raise/log internally on failure)
     ledger_resp = update_ledger(lp_amount, user_id)
-    update_table(email, Decimal("0"), lp_amount, Decimal(0), RATE, "", "", "", json.dumps(ledger_resp), "", event_name, prize)
+    status = "success" if ledger_resp.get("HTTPStatusCode") == 200 else "failure"
+    update_table(email, Decimal("0"), lp_amount, Decimal(0), RATE, "", "", "", status, "", event_name, prize)
     return {"statusCode": 200, "body": json.dumps({"Prize": prize, "TransactionStatus": "ledger_updated"})}
   
 # --- Event-specific high-level wrappers (these call above helpers) ---
