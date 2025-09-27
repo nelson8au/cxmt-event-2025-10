@@ -138,8 +138,8 @@ def update_ledger(lp_amount: Decimal, user_id: str) -> Dict[str, Any]:
     try:
         resp = ledger_table.update_item(
             Key={"user_id": user_id, "ledger_type": "Normal"},
-            UpdateExpression="SET lp_ledger.entry_id = :vals, lp_wallets = if_not_exists(lp_wallets, :zero) + :lp, last_lp_update = :dt",
-            ExpressionAttributeNames={"#eid": entry_id},
+            UpdateExpression="SET lp_ledger.#entry_id = :vals, lp_wallets = lp_wallets + :lp, last_lp_update = :dt",
+            ExpressionAttributeNames={"#entry_id": entry_id},
             ExpressionAttributeValues={
                 ":vals": items,
                 ":lp": Decimal(str(lp_amount)),
