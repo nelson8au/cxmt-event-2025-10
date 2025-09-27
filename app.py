@@ -216,10 +216,11 @@ def fetch_wallet(user_id: int) -> Optional[str]:
     try:
         resp = session.post(url, json=payload, timeout=10)
         if resp.status_code == 401:
+            print('resp', resp)
             print(f"Unauthorized access for user {user_id}")
             return None
         data = safe_json(resp)
-        print('data', data)
+        
         if isinstance(data, list) and data:
             wallet_id = data[0].get("id")
             print("fetch_wallet -> %s", wallet_id)
