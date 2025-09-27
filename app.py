@@ -433,8 +433,8 @@ def lambda_handler(event, context):
     if funcname == "getBalance":
         from topup import manage_event
         res=manage_event("check")
+        return {"statusCode": 200, "body": json.dumps({"message": "balance check requested", "data":res})}
 
-        return {"statusCode": 200, "body": res}
 
     if funcname == "topup_event":
         eventdate = params.get("eventdate")
