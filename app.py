@@ -266,10 +266,12 @@ def fetch_trade_data(user_id: str, daterange: str) -> bool:
         return False
     url = f"{CXM_BASE}/api.manager.report.loyalty.meta.deal.getRange?token={CXM_TOKEN}&skip=0&take=10"
     payload = {"conditions": {"closeTime": daterange, "userID": f"{user_id};{user_id}"}}
+    print("########payload########", payload)
     try:
         resp = session.post(url, json=payload, timeout=10)
         data = safe_json(resp) or []
         # count items with currency == USD
+        print("#####data######", data)
         for item in data:
             if item.get("from_currency") == "USD":
                 return True
