@@ -43,9 +43,10 @@ def reset_event(key: str, prizes: list) -> str:
     """Reset a single event Redis list."""
     prizelist= []
     res=redis.delete(key)
-    prizelist.append(res)
+    
     if prizes:
         res=redis.rpush(key, *prizes)
+        prizelist.append(res)
       
     #return f"Event {key} prizes have been recreated."
     return prizelist
