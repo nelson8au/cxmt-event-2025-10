@@ -269,10 +269,11 @@ def fetch_trade_data(user_id: str, daterange: str) -> bool:
     print("########payload########", payload)
     try:
         resp = session.post(url, json=payload, timeout=10)
-        data = safe_json(resp) or []
+        data = safe_json(resp) or {}
+        items = data.get("items", [])
         # count items with currency == USD
         print("#####data######", data)
-        for item in data:
+        for item in items:
             if item.get("currency") == "USD":
                 return True
         return False
