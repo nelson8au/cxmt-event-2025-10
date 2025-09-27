@@ -418,15 +418,15 @@ def lambda_handler(event, context):
 
     # Map funcname to prize_key, event name and eligibility
     mapping = {
-        "e20251001": {"prize_key": "2005mid:1001", "event": "2025-10-01", "eligibility": None},
-        "e20251002": {"prize_key": "2005mid:1002", "event": "2025-10-02", "eligibility": deposit_eligibility_factory("2025-09-01;2025-09-30", Decimal("2000"))},
-        "e20251003": {"prize_key": "2005mid:1003", "event": "2025-10-03", "eligibility": trade_eligibility_factory("2025-10-01;2025-10-02")},
-        "e20251004": {"prize_key": "2005mid:1004", "event": "2025-10-04", "eligibility": trade_eligibility_factory("2025-10-03;2025-10-03")},
-        "e20251005": {"prize_key": "2005mid:1005", "event": "2025-10-05", "eligibility": deposit_eligibility_factory("2025-10-01;2025-10-04", Decimal("500"))},
-        "e20251006": {"prize_key": "2005mid:1006", "event": "2025-10-06", "eligibility": None},
-        "e20251007": {"prize_key": "2005mid:1007", "event": "2025-10-07", "eligibility": trade_eligibility_factory("2025-10-06;2025-10-06")},
-        #"e20251008": {"prize_key": "2005mid:1008", "event": "2025-10-08", "eligibility": trade_eligibility_factory("2025-10-07;2025-10-07")},
-        "e20251008": {"prize_key": "2005mid:1008", "event": "2025-10-08", "eligibility": None},
+        "e20251001": {"prize_key": "2025mid:1001", "event": "2025-10-01", "eligibility": None},
+        "e20251002": {"prize_key": "2025mid:1002", "event": "2025-10-02", "eligibility": deposit_eligibility_factory("2025-09-01;2025-09-30", Decimal("2000"))},
+        "e20251003": {"prize_key": "2025mid:1003", "event": "2025-10-03", "eligibility": trade_eligibility_factory("2025-10-01;2025-10-02")},
+        "e20251004": {"prize_key": "2025mid:1004", "event": "2025-10-04", "eligibility": trade_eligibility_factory("2025-10-03;2025-10-03")},
+        "e20251005": {"prize_key": "2025mid:1005", "event": "2025-10-05", "eligibility": deposit_eligibility_factory("2025-10-01;2025-10-04", Decimal("500"))},
+        "e20251006": {"prize_key": "2025mid:1006", "event": "2025-10-06", "eligibility": None},
+        "e20251007": {"prize_key": "2025mid:1007", "event": "2025-10-07", "eligibility": trade_eligibility_factory("2025-10-06;2025-10-06")},
+        #"e20251008": {"prize_key": "2025mid:1008", "event": "2025-10-08", "eligibility": trade_eligibility_factory("2025-10-07;2025-10-07")},
+        "e20251008": {"prize_key": "2025mid:1008", "event": "2025-10-08", "eligibility": None},
     }
 
     if funcname is None:

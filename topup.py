@@ -82,7 +82,7 @@ def manage_event(eventname: str):
         elif eventname in prizes_dict:
             idx = list(prizes_dict.keys()).index(eventname) + 1
             key = f"2025mid:100{idx}"
-            return reset_event(key)
+            return topup_event(key)
 
         else:
             return f"Unknown event: {eventname}"
