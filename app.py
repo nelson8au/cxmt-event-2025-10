@@ -369,13 +369,15 @@ def handle_event_generic(email: str, prize_key: str, event_name: str, eligibilit
     # Heuristics: if prize looks numeric -> red envelope; if contains "京东" or "E卡" -> email; else if prize looks like LP -> treat as lp
     try:
         prize_clean = prize.strip()
+        print('prize_clean', prize_clean)
         # numeric -> red envelope
         try:
             float(prize_clean)
             return process_red_envelope(email, prize_clean, event_name, prize_key)
         except Exception:
             # not numeric
-            if "京东" in prize_clean or "E卡" in prize_clean or "E卡" in prize_clean:
+            if "京东" in prize_clean or "京东" in prize_clean or "E卡" in prize_clean:
+                print("京东京东")
                 return process_email_prize(email, prize_clean, event_name)
             if prize_type_hint == "lp" or prize_clean.lower().startswith("lp") or "point" in prize_clean.lower():
                 return process_lp_or_coupon(email, prize_clean, event_name)
