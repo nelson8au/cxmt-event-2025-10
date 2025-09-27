@@ -207,7 +207,7 @@ def fetch_deposit(date_range: str, user_id: str) -> Optional[Decimal]:
 def fetch_wallet(user_id: str) -> Optional[str]:
     """Return first wallet id from CXM wallet endpoint."""
     if not CXM_TOKEN:
-        print("CXM_TOKEN not provided")
+        
         return None
     url = f"{CXM_BASE}/api.lps.user.wallet.getWallets?token={CXM_TOKEN}"
     print(url)
@@ -215,6 +215,9 @@ def fetch_wallet(user_id: str) -> Optional[str]:
 
     try:
         resp = session.post(url, json=payload, timeout=10)
+        if resp.status_code == 401:
+            print(f"Unauthorized access for user {user_id}")
+            return None
         data = safe_json(resp)
         print('data', data)
         if isinstance(data, list) and data:
