@@ -24,7 +24,7 @@ LEDGER_TABLE = os.getenv("LEDGER_TABLE", "cxmt-lps-ledger")
 
 # External endpoints & token should come from environment
 CXM_BASE = os.getenv("CXM_BASE", "https://secure.cxmtrading.com")
-CXM_TOKEN = os.getenv("CXM_TOKEN", "eyJpZCI6MTcsInVzZXJJZCI6MTAwMDAxMCwidHlwZSI6InN0YXRpYyIsImV4cGlyZWRBdCI6IjIwNTAtMDQtMTRUMDA6MDA6MDBaIiwicmVhZE9ubHkiOmZhbHNlLCJpc0FkbWluU2lnbmVkQXNVc2VyIjp0cnVlfS5exvzV6DaIzsRwADxBrqOPSJeU3eYSkPHQVt0Ps/s+")  # token only via env var
+CXM_TOKEN = os.getenv("CXM_TOKEN", "eyJpZCI6MTcsInVzZXJJZCI6MTAwMDAxMCwidHlwZSI6InN0YXRpYyIsImV4cGlyZWRBdCI6IjIwNTAtMDQtMTRUMDA6MDA6MDBaIiwicmVhZE9ubHkiOmZhbHNlLCJpc0FkbWluU2lnbmVkQXNVc2VyIjp0cnVlfS5exvzV6DaIzsRwADxBrqOPSJeU3eYSkPHQVt0Ps%2Fs%2B")  # token only via env var
 
 # Business constants
 RATE = Decimal(os.getenv("USD_RATE", "7.1"))
