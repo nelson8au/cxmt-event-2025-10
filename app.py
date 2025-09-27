@@ -211,11 +211,12 @@ def fetch_wallet(user_id: str) -> Optional[str]:
         return None
     url = f"{CXM_BASE}/api.lps.user.wallet.getWallets?token={CXM_TOKEN}"
     payload = {"userId": user_id}
-    print('payload',payload)
+
     try:
         resp = session.post(url, json=payload, timeout=10)
         data = safe_json(resp)
         if isinstance(data, list) and data:
+            print('data', data)
             wallet_id = data[0].get("id")
             print("fetch_wallet -> %s", wallet_id)
             return wallet_id
