@@ -63,6 +63,7 @@ def manage_event(eventname: str):
             # Reset all events
             for idx, prizes in enumerate(prizes_dict.values(), start=1):
                 redis_key = f"2005mid:100{idx}"
+                print(redis_key, prizes)
                 reset_event(redis_key, prizes)
             return "All events are updated"
 
