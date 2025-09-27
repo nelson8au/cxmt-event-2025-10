@@ -15,6 +15,7 @@ from redis import Redis
 #     ssl=REDIS_SSL,
 # )
 redis=Redis(host='cxmt-cache-eqwznd.serverless.apne1.cache.amazonaws.com', port=6379, decode_responses=True, ssl=True, username='default')
+print(redis)
 # --- Prize initialization ---
 def init_all_prizes():
     """
@@ -51,7 +52,7 @@ def check_all_event_lengths() -> dict:
     """Return current lengths of all Redis prize lists."""
     lengths = {}
     for i in range(1, 9):
-        key = f"2005mid:100{i}"
+        key = f"2025mid:100{i}"
         lengths[key] = redis.llen(key)
     return lengths
 
@@ -62,7 +63,7 @@ def manage_event(eventname: str):
         if eventname == "all":
             # Reset all events
             for idx, prizes in enumerate(prizes_dict.values(), start=1):
-                redis_key = f"2005mid:100{idx}"
+                redis_key = f"2025mid:100{idx}"
                 print(redis_key, prizes)
                 reset_event(redis_key, prizes)
             return "All events are updated"
@@ -74,7 +75,7 @@ def manage_event(eventname: str):
         elif eventname in prizes_dict:
             # Reset a single event
             idx = list(prizes_dict.keys()).index(eventname) + 1
-            return reset_event(f"2005mid:100{idx}", prizes_dict[eventname])
+            return reset_event(f"2025mid:100{idx}", prizes_dict[eventname])
 
         else:
             return "The event name you provided is not in the list. Please check the event name."
