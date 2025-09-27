@@ -332,7 +332,7 @@ def process_lp_or_coupon(email: str, prize: str, event_name: str, lp_amount: Dec
         return {"statusCode": 400, "body": json.dumps({"Status": "error", "Message": "User not found"})}
     # Update ledger (will raise/log internally on failure)
     ledger_resp = update_ledger(lp_amount, user_id)
-    status = "success" if ledger_resp.get("HTTPStatusCode") == 200 else "failure"
+    status = "success" if ledger_resp.ResponseMetadata.get("HTTPStatusCode") == 200 else "failure"
     update_table(email, Decimal("0"), lp_amount, Decimal(0), RATE, "", "", "", status, "", event_name, prize)
     return {"statusCode": 200, "body": json.dumps({"Prize": prize, "TransactionStatus": "ledger_updated"})}
   
