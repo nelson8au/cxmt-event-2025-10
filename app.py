@@ -71,7 +71,7 @@ def safe_json(resp: requests.Response) -> Optional[Any]:
     try:
         return resp.json()
     except ValueError:
-        print("Response has no JSON: %s", resp.text)
+        print(f"Response has no JSON: %s", resp.text)
         return None
 
 def update_table(
@@ -117,10 +117,10 @@ def update_table(
             },
             ReturnValues="ALL_NEW",
         )
-        print("Updated record_table: %s", resp)
+        print(f"Updated record_table: %s", resp)
         return resp
     except Exception as exc:
-        print("Failed to update record table for %s", email)
+        print(f"Failed to update record table for %s", email)
         raise
 
 def update_ledger(lp_amount: Decimal, user_id: str) -> Dict[str, Any]:
@@ -151,7 +151,7 @@ def update_ledger(lp_amount: Decimal, user_id: str) -> Dict[str, Any]:
         print("Updated ledger: %s", resp)
         return resp
     except Exception:
-        print("Failed to update ledger for user_id=%s", user_id)
+        print(f"Failed to update ledger for user_id=%s", user_id)
         raise
 
 def query_ledger(email: str) -> Optional[str]:
@@ -160,16 +160,16 @@ def query_ledger(email: str) -> Optional[str]:
         resp = ledger_table.query(IndexName="email-index", KeyConditionExpression=Key("email").eq(email))
         items = resp.get("Items", [])
         if not items:
-            print("No ledger entry found for email %s", email)
+            print(f"No ledger entry found for email %s", email)
             return None
         user_id = items[0].get("user_id")
-        print("Found user_id %s for email %s", user_id, email)
+        print(f"Found user_id %s for email %s", user_id, email)
         return user_id
     except ledger_table.meta.client.exceptions.ResourceNotFoundException:
-        print("Ledger table or index not found")
+        print(f"Ledger table or index not found")
         return None
     except Exception:
-        print("Error querying ledger for %s", email)
+        print(f"Error querying ledger for %s", email)
         return None
 
 def query_event_rec(email: str, day: str) -> bool:
@@ -177,17 +177,17 @@ def query_event_rec(email: str, day: str) -> bool:
     try:
         resp = record_table.get_item(Key={"email": email, "date": day})
         exists = "Item" in resp
-        print("Event record exists for %s on %s: %s", email, day, exists)
+        print(f"Event record exists for %s on %s: %s", email, day, exists)
         return exists
     except Exception:
-        print("Failed to query event record for %s", email)
+        print(f"Failed to query event record for %s", email)
         return False
 
 # --- CXM / external helper calls ---
 def fetch_deposit(date_range: str, user_id: str) -> Optional[Decimal]:
     """Fetch deposit summary amountInUsd from CXM manager endpoint."""
     if not CXM_TOKEN:
-        print("CXM_TOKEN not provided")
+        print(f"CXM_TOKEN not provided")
         return None
     url = f"{CXM_BASE}/api.manager.trans.getRange?token={CXM_TOKEN}&skip=0&take=10"
     payload = {"conditions": {"displayType": "deposit", "displayStatus": "success", "createdAt": date_range}, "isLd": False, "userId": user_id, "IsExcludeTransfers": True}
@@ -198,10 +198,10 @@ def fetch_deposit(date_range: str, user_id: str) -> Optional[Decimal]:
         if data and isinstance(data, dict) and "summary" in data:
             amt = data["summary"].get("amountInUsd")
             return Decimal(str(amt)) if amt is not None else None
-        print("No summary in fetch_deposit response: %s", data)
+        print(f"No summary in fetch_deposit response: %s", data)
         return None
     except Exception:
-        print("Error fetching deposit for user_id=%s", user_id)
+        print(f"Error fetching deposit for user_id=%s", user_id)
         return None
 
 def fetch_wallet(user_id: int) -> Optional[str]:
@@ -210,59 +210,59 @@ def fetch_wallet(user_id: int) -> Optional[str]:
         
         return None
     url = f"{CXM_BASE}/api.lps.user.wallet.getWallets?token={CXM_TOKEN}"
-    print(url)
+
     payload = {"userId": user_id}
 
     try:
         resp = session.post(url, json=payload, timeout=10)
         if resp.status_code == 401:
-            print('resp', resp)
+            print(f'resp', resp)
             print(f"Unauthorized access for user {user_id}")
             return None
         data = safe_json(resp)
         
         if isinstance(data, list) and data:
             wallet_id = data[0].get("id")
-            print("fetch_wallet -> %s", wallet_id)
+            print(f"fetch_wallet -> %s", wallet_id)
             return wallet_id
-        print("fetch_wallet returned empty: %s", data)
+        print(f"fetch_wallet returned empty: %s", data)
         return None
     except Exception:
-        print("Error fetching wallet for %s", user_id)
+        print(f"Error fetching wallet for %s", user_id)
         return None
 
 def transfer_meta_credit(account: str, amount: Decimal) -> Optional[requests.Response]:
     if not CXM_TOKEN:
-        print("CXM_TOKEN not provided")
+        print(f"CXM_TOKEN not provided")
         return None
     url = f"{CXM_BASE}/api.lps.user.wallet.addMetaCredit?token={CXM_TOKEN}"
     payload = {"metaAccountId": account, "amount": float(amount), "comment": "Middle Autumn Lucky Draw", "expiration": "2025-10-31T23:14:01.1622132Z"}
     try:
         resp = session.post(url, json=payload, timeout=10)
-        print("transfer_meta_credit status=%s", resp.status_code)
+        print(f"transfer_meta_credit status=%s", resp.status_code)
         return resp
     except Exception:
-        print("transfer_meta_credit failed")
+        print(f"transfer_meta_credit failed")
         return None
 
 def transfer_money_wallet(wallet: str, amount: Decimal) -> Optional[requests.Response]:
     if not CXM_TOKEN:
-        print("CXM_TOKEN not provided")
+        print(f"CXM_TOKEN not provided")
         return None
     url = f"{CXM_BASE}/api.lps.user.wallet.walletBalanceCorrection?token={CXM_TOKEN}"
     payload = {"lpsWalletId": wallet, "amount": float(amount), "comment": "Middle Autumn Lucky Draw"}
     try:
         resp = session.post(url, json=payload, timeout=10)
-        print("transfer_money_wallet status=%s", resp.status_code)
+        print(f"transfer_money_wallet status=%s", resp.status_code)
         return resp
     except Exception:
-        print("transfer_money_wallet failed")
+        print(f"transfer_money_wallet failed")
         return None
 
 def fetch_trade_data(user_id: str, daterange: str) -> bool:
     """Return True if user has at least one USD trade in given date range."""
     if not CXM_TOKEN:
-        print("CXM_TOKEN not provided")
+        print(f"CXM_TOKEN not provided")
         return False
     url = f"{CXM_BASE}/api.manager.report.loyalty.meta.deal.getRange?token={CXM_TOKEN}&skip=0&take=10"
     payload = {"conditions": {"closeTime": daterange, "userID": f"{user_id};{user_id}"}}
@@ -275,17 +275,17 @@ def fetch_trade_data(user_id: str, daterange: str) -> bool:
                 return True
         return False
     except Exception:
-        print("Error fetching trade data for %s", user_id)
+        print(f"Error fetching trade data for %s", user_id)
         return False
 
 # --- Prize processing (generic) ---
 def pop_prize(prize_key: str) -> Optional[str]:
     try:
         prize = redis.rpop(prize_key)
-        print("popped prize from %s -> %s", prize_key, prize)
+        print(f"popped prize from %s -> %s", prize_key, prize)
         return prize
     except Exception:
-        print("Failed to pop prize key=%s", prize_key)
+        print(f"Failed to pop prize key=%s", prize_key)
         return None
 
 def process_red_envelope(email: str, prize: str, event_name: str, prize_key: str) -> Dict[str, Any]:
@@ -295,7 +295,7 @@ def process_red_envelope(email: str, prize: str, event_name: str, prize_key: str
     try:
         rp_amount = Decimal(str(float(prize)))
     except Exception:
-        print("Invalid red envelope amount: %s", prize)
+        print(f"Invalid red envelope amount: %s", prize)
         return {"statusCode": 400, "body": json.dumps({"Status": "error", "Message": "Invalid prize amount"})}
 
     trans_amt = (rp_amount / RATE).quantize(Decimal("0.01"))
@@ -356,7 +356,7 @@ def handle_event_generic(email: str, prize_key: str, event_name: str, eligibilit
         try:
             ok = eligibility_fn(user_id)
         except Exception:
-            print("Eligibility check failed for %s", user_id)
+            print(f"Eligibility check failed for %s", user_id)
             return {"statusCode": 500, "body": json.dumps({"Status": "error", "Message": "Unable to verify eligibility"})}
         if not ok:
             return {"statusCode": 200, "body": json.dumps({"Status": "2", "Message": RETURN_MSG["msg4"]})}
@@ -382,7 +382,7 @@ def handle_event_generic(email: str, prize_key: str, event_name: str, eligibilit
             # fallback: email
             return process_email_prize(email, prize_clean, event_name)
     except Exception:
-        print("Error processing prize for %s prize=%s", email, prize)
+        print(f"Error processing prize for {email} prize={prize}")
         return {"statusCode": 500, "body": json.dumps({"Status": "error", "Message": "Internal error while processing prize"})}
 
 # --- Eligibility helper factory examples ---
@@ -469,7 +469,7 @@ def lambda_handler(event, context):
     return result
 
 # If running locally for testing:
-if __name__ == "__main__":
-    # quick local test harness (adjust body and queryStringParameters)
-    fake_event = {"body": json.dumps({"event_name": "autumn", "email": "test@example.com"}), "queryStringParameters": {"funcname": "e20251001"}}
-    print(lambda_handler(fake_event, None))
+# if __name__ == "__main__":
+#     # quick local test harness (adjust body and queryStringParameters)
+#     fake_event = {"body": json.dumps({"event_name": "autumn", "email": "test@example.com"}), "queryStringParameters": {"funcname": "e20251001"}}
+#     print(lambda_handler(fake_event, None))
