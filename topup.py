@@ -42,14 +42,14 @@ def init_all_prizes():
 def topup_event(key: str, prizes: list) -> str:
     """Delete + repopulate prizes for a single event key."""
     redis.delete(key)
-    redis.lpush(key, *prizes)
-    return f"[TOPUP] {key} recreated with {len(prizes)} prizes."
+    if prizes:
+        redis.rpush(key, *prizes)
+    return f"Event {key} prizes have been recreated with {len(prizes)} items."
 
 def reset_event(key: str) -> str:
     """Delete a single event key only."""
-    redis.delete(key)
-    return f"[RESET] {key} deleted. Exists now? {bool(redis.exists(key))}"
-
+    deleted = redis.delete(key)
+    return f"Event {key} deleted (deleted={deleted})."
 def check_all_event_lengths() -> dict:
     """Check lengths of all event keys."""
     lengths = {}
@@ -81,8 +81,9 @@ def manage_event(eventname: str):
 
         elif eventname in prizes_dict:
             idx = list(prizes_dict.keys()).index(eventname) + 1
-            key = f"2025mid:100{idx}"
-            return topup_event(key)
+            redis_key = f"2025mid:100{idx}"
+            return topup_event(redis_key, prizes_dict[eventname])
+
 
         else:
             return f"Unknown event: {eventname}"
