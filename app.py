@@ -138,12 +138,12 @@ def update_ledger(lp_amount: Decimal, user_id: str) -> Dict[str, Any]:
     try:
         resp = ledger_table.update_item(
             Key={"user_id": user_id, "ledger_type": "Normal"},
-            UpdateExpression="SET lp_ledger.#eid = :vals, lp_wallets = if_not_exists(lp_wallets, :zero) + :lp, last_lp_update = :dt",
+            UpdateExpression="SET lp_ledger.entry_id = :vals, lp_wallets = if_not_exists(lp_wallets, :zero) + :lp, last_lp_update = :dt",
             ExpressionAttributeNames={"#eid": entry_id},
             ExpressionAttributeValues={
                 ":vals": items,
                 ":lp": Decimal(str(lp_amount)),
-                ":dt": datetime.utcnow().isoformat(),
+                ":dt": datetime.now(shanghai_tz).isoformat(),
                 ":zero": Decimal("0"),
             },
             ReturnValues="ALL_NEW",
@@ -266,13 +266,13 @@ def fetch_trade_data(user_id: str, daterange: str) -> bool:
         return False
     url = f"{CXM_BASE}/api.manager.report.loyalty.meta.deal.getRange?token={CXM_TOKEN}&skip=0&take=10"
     payload = {"conditions": {"closeTime": daterange, "userID": f"{user_id};{user_id}"}}
-    print("########payload########", payload)
+
     try:
         resp = session.post(url, json=payload, timeout=10)
         data = safe_json(resp) or {}
         items = data.get("items", [])
         # count items with currency == USD
-        print("#####data######", data)
+ 
         for item in items:
             if item.get("currency") == "USD":
                 return True
@@ -327,14 +327,15 @@ def process_email_prize(email: str, prize: str, event_name: str) -> Dict[str, An
    
 def process_lp_or_coupon(email: str, prize: str, event_name: str, lp_amount: Decimal = Decimal("18")) -> Dict[str, Any]:
     """Handle awarding loyalty points (lp) or coupons. Default lp_amount 18 (as in original)."""
+    print('lp': lp_amount)
     user_id = query_ledger(email)
     if not user_id:
         return {"statusCode": 400, "body": json.dumps({"Status": "error", "Message": "User not found"})}
     # Update ledger (will raise/log internally on failure)
     ledger_resp = update_ledger(lp_amount, user_id)
-    update_table(email, Decimal("0"), lp_amount, lp_amount, RATE, "", "", "", json.dumps(ledger_resp), "", event_name, prize)
+    update_table(email, Decimal("0"), lp_amount, Decimal(0), RATE, "", "", "", json.dumps(ledger_resp), "", event_name, prize)
     return {"statusCode": 200, "body": json.dumps({"Prize": prize, "TransactionStatus": "ledger_updated"})}
-
+  
 # --- Event-specific high-level wrappers (these call above helpers) ---
 def handle_event_generic(email: str, prize_key: str, event_name: str, eligibility_fn=None, prize_type_hint: Optional[str] = None):
     """
