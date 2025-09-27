@@ -71,7 +71,7 @@ def safe_json(resp: requests.Response) -> Optional[Any]:
     try:
         return resp.json()
     except ValueError:
-        print(f"Response has no JSON: %s", resp.text)
+        print(f"Response has no JSON: {resp.text}" )
         return None
 
 def update_table(
@@ -117,10 +117,10 @@ def update_table(
             },
             ReturnValues="ALL_NEW",
         )
-        print(f"Updated record_table: %s", resp)
+        print(f"Updated record_table: {resp}")
         return resp
     except Exception as exc:
-        print(f"Failed to update record table for %s", email)
+        print(f"Failed to update record table for {email}" )
         raise
 
 def update_ledger(lp_amount: Decimal, user_id: str) -> Dict[str, Any]:
@@ -148,10 +148,10 @@ def update_ledger(lp_amount: Decimal, user_id: str) -> Dict[str, Any]:
             },
             ReturnValues="ALL_NEW",
         )
-        print("Updated ledger: %s", resp)
+        print("Updated ledger: {resp}" )
         return resp
     except Exception:
-        print(f"Failed to update ledger for user_id=%s", user_id)
+        print(f"Failed to update ledger for user_id={user_id}" )
         raise
 
 def query_ledger(email: str) -> Optional[str]:
@@ -160,16 +160,16 @@ def query_ledger(email: str) -> Optional[str]:
         resp = ledger_table.query(IndexName="email-index", KeyConditionExpression=Key("email").eq(email))
         items = resp.get("Items", [])
         if not items:
-            print(f"No ledger entry found for email %s", email)
+            print(f"No ledger entry found for email {email})")
             return None
         user_id = items[0].get("user_id")
-        print(f"Found user_id %s for email %s", user_id, email)
+        print(f"Found user_id {user_id} for email {email}")
         return user_id
     except ledger_table.meta.client.exceptions.ResourceNotFoundException:
-        print(f"Ledger table or index not found")
+        print("Ledger table or index not found")
         return None
-    except Exception:
-        print(f"Error querying ledger for %s", email)
+    except Exception as e:
+        print(f"Error querying ledger for {email}: {e}")
         return None
 
 def query_event_rec(email: str, day: str) -> bool:
@@ -177,10 +177,10 @@ def query_event_rec(email: str, day: str) -> bool:
     try:
         resp = record_table.get_item(Key={"email": email, "date": day})
         exists = "Item" in resp
-        print(f"Event record exists for %s on %s: %s", email, day, exists)
+        print(f"Event record exists for {email} on day {exists}")
         return exists
     except Exception:
-        print(f"Failed to query event record for %s", email)
+        print(f"Failed to query event record for {email}")
         return False
 
 # --- CXM / external helper calls ---
@@ -198,10 +198,10 @@ def fetch_deposit(date_range: str, user_id: str) -> Optional[Decimal]:
         if data and isinstance(data, dict) and "summary" in data:
             amt = data["summary"].get("amountInUsd")
             return Decimal(str(amt)) if amt is not None else None
-        print(f"No summary in fetch_deposit response: %s", data)
+        print(f"No summary in fetch_deposit response: {data}" )
         return None
     except Exception:
-        print(f"Error fetching deposit for user_id=%s", user_id)
+        print(f"Error fetching deposit for user_id={user_id}" )
         return None
 
 def fetch_wallet(user_id: int) -> Optional[str]:
@@ -223,12 +223,12 @@ def fetch_wallet(user_id: int) -> Optional[str]:
         
         if isinstance(data, list) and data:
             wallet_id = data[0].get("id")
-            print(f"fetch_wallet -> %s", wallet_id)
+            print(f"fetch_wallet -> {wallet_id}")
             return wallet_id
-        print(f"fetch_wallet returned empty: %s", data)
+        print(f"fetch_wallet returned empty: {data}")
         return None
     except Exception:
-        print(f"Error fetching wallet for %s", user_id)
+        print(f"Error fetching wallet for {user_id}")
         return None
 
 def transfer_meta_credit(account: str, amount: Decimal) -> Optional[requests.Response]:
@@ -239,7 +239,7 @@ def transfer_meta_credit(account: str, amount: Decimal) -> Optional[requests.Res
     payload = {"metaAccountId": account, "amount": float(amount), "comment": "Middle Autumn Lucky Draw", "expiration": "2025-10-31T23:14:01.1622132Z"}
     try:
         resp = session.post(url, json=payload, timeout=10)
-        print(f"transfer_meta_credit status=%s", resp.status_code)
+        print(f"transfer_meta_credit status={resp.status_code}")
         return resp
     except Exception:
         print(f"transfer_meta_credit failed")
@@ -253,7 +253,7 @@ def transfer_money_wallet(wallet: str, amount: Decimal) -> Optional[requests.Res
     payload = {"lpsWalletId": wallet, "amount": float(amount), "comment": "Middle Autumn Lucky Draw"}
     try:
         resp = session.post(url, json=payload, timeout=10)
-        print(f"transfer_money_wallet status=%s", resp.status_code)
+        print(f"transfer_money_wallet status={resp.status_code}")
         return resp
     except Exception:
         print(f"transfer_money_wallet failed")
@@ -275,17 +275,17 @@ def fetch_trade_data(user_id: str, daterange: str) -> bool:
                 return True
         return False
     except Exception:
-        print(f"Error fetching trade data for %s", user_id)
+        print(f"Error fetching trade data for {user_id}")
         return False
 
 # --- Prize processing (generic) ---
 def pop_prize(prize_key: str) -> Optional[str]:
     try:
         prize = redis.rpop(prize_key)
-        print(f"popped prize from %s -> %s", prize_key, prize)
+        print(f"popped prize from {prize_key} -> {prize}" )
         return prize
     except Exception:
-        print(f"Failed to pop prize key=%s", prize_key)
+        print(f"Failed to pop prize key={}" )
         return None
 
 def process_red_envelope(email: str, prize: str, event_name: str, prize_key: str) -> Dict[str, Any]:
@@ -295,7 +295,7 @@ def process_red_envelope(email: str, prize: str, event_name: str, prize_key: str
     try:
         rp_amount = Decimal(str(float(prize)))
     except Exception:
-        print(f"Invalid red envelope amount: %s", prize)
+        print(f"Invalid red envelope amount: {prize}")
         return {"statusCode": 400, "body": json.dumps({"Status": "error", "Message": "Invalid prize amount"})}
 
     trans_amt = (rp_amount / RATE).quantize(Decimal("0.01"))
