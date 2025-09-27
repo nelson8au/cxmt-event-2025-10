@@ -271,7 +271,7 @@ def fetch_trade_data(user_id: str, daterange: str) -> bool:
         data = safe_json(resp) or []
         # count items with currency == USD
         for item in data:
-            if item.get("currency") == "USD":
+            if item.get("from_currency") == "USD":
                 return True
         return False
     except Exception:
@@ -356,7 +356,7 @@ def handle_event_generic(email: str, prize_key: str, event_name: str, eligibilit
         try:
             ok = eligibility_fn(user_id)
         except Exception:
-            print(f"Eligibility check failed for %s", user_id)
+            print(f"Eligibility check failed for {user_id}")
             return {"statusCode": 500, "body": json.dumps({"Status": "error", "Message": "Unable to verify eligibility"})}
         if not ok:
             return {"statusCode": 200, "body": json.dumps({"Status": "2", "Message": RETURN_MSG["msg4"]})}
