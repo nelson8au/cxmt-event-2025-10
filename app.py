@@ -327,7 +327,7 @@ def process_email_prize(email: str, prize: str, event_name: str) -> Dict[str, An
    
 def process_lp_or_coupon(email: str, prize: str, event_name: str, lp_amount: Decimal = Decimal("18")) -> Dict[str, Any]:
     """Handle awarding loyalty points (lp) or coupons. Default lp_amount 18 (as in original)."""
-    print('lp': lp_amount)
+    print('lp', lp_amount)
     user_id = query_ledger(email)
     if not user_id:
         return {"statusCode": 400, "body": json.dumps({"Status": "error", "Message": "User not found"})}
