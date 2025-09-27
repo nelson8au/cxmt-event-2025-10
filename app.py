@@ -383,7 +383,7 @@ def handle_event_generic(email: str, prize_key: str, event_name: str, eligibilit
             if "京东" in prize_clean or "京东" in prize_clean or "E卡" in prize_clean:
                 print("京东京东")
                 return process_email_prize(email, prize_clean, event_name)
-            if prize_type_hint == "lp" or prize_clean.lower().startswith("lp") or "point" in prize_clean.lower():
+            if "商城" in prize_clean or "商城" in prize_clean or "积分" in prize_clean:
                 return process_lp_or_coupon(email, prize_clean, event_name)
             # fallback: email
             return process_email_prize(email, prize_clean, event_name)
