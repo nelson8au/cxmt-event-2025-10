@@ -40,68 +40,52 @@ def init_all_prizes():
 
 # --- Redis helpers ---
 def topup_event(key: str, prizes: list) -> str:
-    """Reset a single event Redis list."""
+    """Delete + repopulate prizes for a single event key."""
     redis.delete(key)
-    if prizes:
-        redis.rpush(key, *prizes)
-    return f"Event {key} prizes have been recreated."
+    redis.lpush(key, *prizes)
+    return f"[TOPUP] {key} recreated with {len(prizes)} prizes."
+
 def reset_event(key: str) -> str:
-    """Reset a single event Redis list."""
+    """Delete a single event key only."""
     redis.delete(key)
-    return f"Event {key} prizes have been deleted."
+    return f"[RESET] {key} deleted. Exists now? {bool(redis.exists(key))}"
 
 def check_all_event_lengths() -> dict:
-    """Return current lengths of all Redis prize lists."""
+    """Check lengths of all event keys."""
     lengths = {}
     for i in range(1, 9):
         key = f"2025mid:100{i}"
         lengths[key] = redis.llen(key)
     return lengths
 
-# --- Main Lambda-compatible handler ---
+# --- Main manager ---
 def manage_event(eventname: str):
     prizes_dict = init_all_prizes()
     try:
         if eventname == "reset":
-            # Reset all events
+            results = []
+            for idx in range(1, 9):
+                key = f"2025mid:100{idx}"
+                results.append(reset_event(key))
+            return results
+
+        elif eventname == "topupall":
+            results = []
             for idx, prizes in enumerate(prizes_dict.values(), start=1):
-                redis_key = f"2025mid:100{idx}"
-                res=reset_event(redis_key)
-                print('reset',res)
-            return res
-        elif eventname =="topupall":
-            for idx, prizes in enumerate(prizes_dict.values(), start=1):
-                redis_key = f"2025mid:100{idx}"
-                res=topup_event(redis_key, prizes)
+                key = f"2025mid:100{idx}"
+                results.append(topup_event(key, prizes))
+            return results
+
         elif eventname == "check":
-            # Check all Redis list lengths
             return check_all_event_lengths()
 
         elif eventname in prizes_dict:
-            # Reset a single event
             idx = list(prizes_dict.keys()).index(eventname) + 1
-            return reset_event(f"2025mid:100{idx}", prizes_dict[eventname])
+            key = f"2025mid:100{idx}"
+            return reset_event(key)
 
         else:
-            return "The event name you provided is not in the list. Please check the event name."
+            return f"Unknown event: {eventname}"
 
     except Exception as e:
-        return f"Error: {str(e)}"
-
-# --- Optional Lambda integration ---
-# def lambda_handler(event, context):
-#     eventname = None
-#     if event.get("queryStringParameters"):
-#         eventname = event["queryStringParameters"].get("eventname")
-
-#     if not eventname:
-#         return {
-#             "statusCode": 400,
-#             "body": json.dumps({"message": "Missing eventname query parameter"})
-#         }
-
-#     res = manage_event(eventname)
-#     return {
-#         "statusCode": 200,
-#         "body": json.dumps({"message": res})
-#     }
+        return {"error": str(e)}
