@@ -43,7 +43,7 @@ def topup_event(key: str, prizes: list) -> str:
     """Delete + repopulate prizes for a single event key."""
     redis.delete(key)
     if prizes:
-        redis.rpush(key, *prizes)
+        redis.lpush(key, *prizes)
     return f"Event {key} prizes have been recreated with {len(prizes)} items."
 
 def reset_event(key: str) -> str:

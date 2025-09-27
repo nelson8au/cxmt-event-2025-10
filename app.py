@@ -4,7 +4,7 @@ import json
 import logging
 import uuid
 from decimal import Decimal
-from datetime import datetime, date
+from datetime import datetime, timedelta, timezone, date
 from typing import Optional, Any, Dict
 
 import boto3
@@ -28,7 +28,7 @@ CXM_TOKEN = os.getenv("CXM_TOKEN", "eyJpZCI6MTcsInVzZXJJZCI6MTAwMDAxMCwidHlwZSI6
 
 # Business constants
 RATE = Decimal(os.getenv("USD_RATE", "7.1"))
-
+shanghai_tz = timezone(timedelta(hours=8))
 # Logging
 # logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"))
 # logger = logging.getLogger(__name__)
@@ -111,7 +111,7 @@ def update_table(
                 ":rp_status": rp_status or "",
                 ":lp_status": lp_status or "",
                 ":prize_status": prize_status or "",
-                ":dt": datetime.utcnow().isoformat(),
+                ":dt": datetime.now(shanghai_tz).isoformat(),
                 ":event": event_name or "",
                 ":prize": prize or "",
             },
@@ -319,9 +319,9 @@ def process_red_envelope(email: str, prize: str, event_name: str, prize_key: str
 
 def process_email_prize(email: str, prize: str, event_name: str) -> Dict[str, Any]:
     """When prize is to be fulfilled by email (e.g. voucher)."""
-    update_table(email, Decimal("0"), Decimal("0"), Decimal("0"), RATE, "", "", "", "", "email", event_name)
+    update_table(email, Decimal("0"), Decimal("0"), Decimal("0"), RATE, "", "", "", "", "email", event_name, prize)
     return {"statusCode": 200, "body": json.dumps({"Prize": prize, "TransactionStatus": "email"})}
-
+   
 def process_lp_or_coupon(email: str, prize: str, event_name: str, lp_amount: Decimal = Decimal("18")) -> Dict[str, Any]:
     """Handle awarding loyalty points (lp) or coupons. Default lp_amount 18 (as in original)."""
     user_id = query_ledger(email)
