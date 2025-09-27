@@ -147,7 +147,7 @@ def update_ledger(lp_amount: Decimal, user_id: str) -> Dict[str, Any]:
             },
             ReturnValues="ALL_NEW",
         )
-        print("Updated ledger: {resp}" )
+        print(f"Updated ledger: {resp}" )
         return resp
     except Exception:
         print(f"Failed to update ledger for user_id={user_id}" )
