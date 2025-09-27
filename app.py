@@ -273,7 +273,7 @@ def fetch_trade_data(user_id: str, daterange: str) -> bool:
         # count items with currency == USD
         print("#####data######", data)
         for item in data:
-            if item.get("from_currency") == "USD":
+            if item.get("currency") == "USD":
                 return True
         return False
     except Exception:
