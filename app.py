@@ -204,7 +204,7 @@ def fetch_deposit(date_range: str, user_id: str) -> Optional[Decimal]:
         print("Error fetching deposit for user_id=%s", user_id)
         return None
 
-def fetch_wallet(user_id: str) -> Optional[str]:
+def fetch_wallet(user_id: int) -> Optional[str]:
     """Return first wallet id from CXM wallet endpoint."""
     if not CXM_TOKEN:
         
