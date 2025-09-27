@@ -67,6 +67,7 @@ def manage_event(eventname: str):
             for idx, prizes in enumerate(prizes_dict.values(), start=1):
                 redis_key = f"2025mid:100{idx}"
                 res=reset_event(redis_key)
+                print('reset',res)
             return res
         elif eventname =="topupall":
             for idx, prizes in enumerate(prizes_dict.values(), start=1):
