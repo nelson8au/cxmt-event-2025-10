@@ -133,7 +133,7 @@ def update_ledger(lp_amount: Decimal, user_id: str) -> Dict[str, Any]:
         "date": today_str(),
         "description": "Autumn Serial Event Prize 秋季活动奖励",
         "credit": str(lp_amount),
-        "debit": "0",
+        "debit": str(0),
     }
     try:
         resp = ledger_table.update_item(
@@ -143,8 +143,7 @@ def update_ledger(lp_amount: Decimal, user_id: str) -> Dict[str, Any]:
             ExpressionAttributeValues={
                 ":vals": items,
                 ":lp": Decimal(str(lp_amount)),
-                ":dt": datetime.now(shanghai_tz).isoformat(),
-                ":zero": Decimal("0"),
+                ":dt": datetime.now(shanghai_tz).isoformat()
             },
             ReturnValues="ALL_NEW",
         )
