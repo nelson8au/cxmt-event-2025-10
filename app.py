@@ -434,9 +434,12 @@ def lambda_handler(event, context):
     # admin actions
     if funcname == "reset":
         from topup import manage_event  # lazy import in case not available in some contexts
-        res=manage_event("all")
+        res=manage_event("reset")
         return {"statusCode": 200, "body": json.dumps({"message": "reset requested"})}
-
+    if funcname == "topupall":
+        from topup import manage_event  # lazy import in case not available in some contexts
+        res=manage_event("topupall")
+        return {"statusCode": 200, "body": json.dumps({"message": "reset requested"})}
     if funcname == "getBalance":
         from topup import manage_event
         res=manage_event("check")

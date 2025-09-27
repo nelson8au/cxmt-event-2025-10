@@ -39,17 +39,16 @@ def init_all_prizes():
     }
 
 # --- Redis helpers ---
-def reset_event(key: str, prizes: list) -> str:
+def topup_event(key: str, prizes: list) -> str:
     """Reset a single event Redis list."""
-
     redis.delete(key)
-    
     if prizes:
         redis.rpush(key, *prizes)
-
-      
     return f"Event {key} prizes have been recreated."
-
+def reset_event(key: str, prizes: list) -> str:
+    """Reset a single event Redis list."""
+    redis.delete(key)
+    return f"Event {key} prizes have been recreated."
 
 def check_all_event_lengths() -> dict:
     """Return current lengths of all Redis prize lists."""
@@ -63,14 +62,16 @@ def check_all_event_lengths() -> dict:
 def manage_event(eventname: str):
     prizes_dict = init_all_prizes()
     try:
-        if eventname == "all":
+        if eventname == "reset":
             # Reset all events
             for idx, prizes in enumerate(prizes_dict.values(), start=1):
                 redis_key = f"2025mid:100{idx}"
-                
                 res=reset_event(redis_key, prizes)
             return res
-
+        elif eventname =="topupall":
+            for idx, prizes in enumerate(prizes_dict.values(), start=1):
+                redis_key = f"2025mid:100{idx}"
+                res=topup_event(redis_key, prizes)
         elif eventname == "check":
             # Check all Redis list lengths
             return check_all_event_lengths()
